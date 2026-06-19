@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCCI ID – Test Page</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        /* ── LEFT: form panel ── */
+        .form-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 360px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,.10);
+            height: fit-content;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #900010;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #900010;
+            padding-bottom: .5rem;
+        }
+
+        .field { margin-bottom: 1.1rem; }
+
+        label {
+            display: block;
+            font-size: .82rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: .35rem;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: .6rem .8rem;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: .95rem;
+            transition: border-color .2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #900010;
+        }
+
+        button {
+            width: 100%;
+            margin-top: .5rem;
+            padding: .75rem;
+            background: #900010;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        button:hover  { background: #b00015; }
+        button:active { background: #700010; }
+        button:disabled { background: #bbb; cursor: not-allowed; }
+
+        .status {
+            margin-top: .8rem;
+            font-size: .88rem;
+            text-align: center;
+            min-height: 1.2rem;
+            color: #555;
+        }
+
+        /* ── RIGHT: result panel ── */
+        .result-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            flex: 1;
+            box-shadow: 0 2px 12px rgba(0,0,0,.10);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .result-panel h2 { width: 100%; }
+
+        .placeholder {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bbb;
+            font-size: 1rem;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 1rem;
+            min-height: 300px;
+        }
+
+        #resultImg {
+            display: none;
+            max-width: 320px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+            margin-top: 1rem;
+        }
+
+        #downloadBtn {
+            display: none;
+            width: auto;
+            margin-top: 1.2rem;
+            padding: .6rem 2rem;
+            background: #28a745;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .95rem;
+            transition: background .2s;
+        }
+
+        #downloadBtn:hover { background: #218838; }
+
+        /* spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<!-- ── FORM ── -->
+<div class="form-panel">
+    <h2>BCCI ID Test Form</h2>
+
+    <form id="testForm">
+        <div class="field">
+            <label for="photo">Student Photo</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+        </div>
+
+        <div class="field">
+            <label for="student_no">Student No.</label>
+            <input type="text" id="student_no" name="student_no"
+                   value="2026-00123" required>
+        </div>
+
+        <div class="field">
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name"
+                   value="John Paul Cahulogan" required>
+        </div>
+
+        <div class="field">
+            <label for="course_year">Course / Year</label>
+            <input type="text" id="course_year" name="course_year"
+                   value="BSCS - 3RD YEAR" required>
+        </div>
+
+        <button type="submit" id="genBtn">Generate ID</button>
+        <div class="status" id="status"></div>
+    </form>
+</div>
+
+<!-- ── RESULT ── -->
+<div class="result-panel">
+    <h2>Generated Result</h2>
+    <div class="placeholder" id="placeholder">Result will appear here</div>
+    <img id="resultImg" alt="Generated ID">
+    <a id="downloadBtn" download="BCCI_Student_ID.png">Download PNG</a>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8010/generate-id";
+
+document.getElementById("testForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const btn       = document.getElementById("genBtn");
+    const status    = document.getElementById("status");
+    const placeholder = document.getElementById("placeholder");
+    const resultImg = document.getElementById("resultImg");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generating…';
+    status.textContent = "";
+    resultImg.style.display = "none";
+    downloadBtn.style.display = "none";
+    placeholder.style.display = "flex";
+    placeholder.textContent = "Processing… this may take a few seconds.";
+
+    try {
+        const fd = new FormData(this);
+        const res = await fetch(API, { method: "POST", body: fd });
+
+        if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(txt || `HTTP ${res.status}`);
+        }
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+
+        resultImg.src = url;
+        resultImg.style.display = "block";
+        downloadBtn.href = url;
+        downloadBtn.style.display = "inline-block";
+        placeholder.style.display = "none";
+        status.style.color = "green";
+        status.textContent = "ID generated successfully!";
+
+    } catch (err) {
+        placeholder.style.display = "flex";
+        placeholder.textContent = "Result will appear here";
+        status.style.color = "red";
+        status.textContent = "Error: " + err.message;
+        console.error(err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Generate ID";
+    }
+});
+</script>
+
+</body>
+</html>
