@@ -10,6 +10,11 @@ import io
 from pathlib import Path
 from typing import Optional
 
+
+#API start command (run in terminal):
+#cd C:\xampp\htdocs\try\bcci_web
+#python -m uvicorn app:app --host 127.0.0.1 --port 8010
+
 app = FastAPI()
 
 app.add_middleware(
