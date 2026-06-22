@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BCCI ID – Test Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -140,6 +141,46 @@
 
         #downloadBtn:hover { background: #218838; }
 
+        /* signature pad */
+        .sig-box {
+            border: 1.5px solid #ccc;
+            border-radius: 7px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        .sig-box canvas { display: block; width: 100%; height: 110px; touch-action: none; }
+        .sig-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ccc;
+            font-size: .85rem;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+        .sig-actions {
+            display: flex;
+            gap: .5rem;
+            margin-top: .4rem;
+        }
+        .sig-actions button {
+            flex: 1;
+            margin: 0;
+            padding: .45rem;
+            font-size: .82rem;
+            font-weight: 600;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        #clearBtn  { background: #e0e0e0; color: #333; }
+        #clearBtn:hover  { background: #ccc; }
+        #undoBtn   { background: #e0e0e0; color: #333; }
+        #undoBtn:hover   { background: #ccc; }
+
         /* spinner */
         .spinner {
             display: inline-block;
@@ -184,6 +225,19 @@
                    value="BSCS - 3RD YEAR" required>
         </div>
 
+        <div class="field">
+            <label>Digital Signature <span style="color:#aaa;font-weight:400">(draw below)</span></label>
+            <div class="sig-box">
+                <canvas id="sigCanvas"></canvas>
+                <span class="sig-hint" id="sigHint">Sign here</span>
+            </div>
+            <div class="sig-actions">
+                <button type="button" id="undoBtn">Undo</button>
+                <button type="button" id="clearBtn">Clear</button>
+            </div>
+            <input type="hidden" name="signature" id="sigData">
+        </div>
+
         <button type="submit" id="genBtn">Generate ID</button>
         <div class="status" id="status"></div>
     </form>
@@ -198,16 +252,70 @@
 </div>
 
 <script>
-const API = "http://127.0.0.1:8010/generate-id";
+const API = (window.location.hostname === "127.0.0.1" && window.location.port === "8010")
+    ? "/generate-id"
+    : "http://127.0.0.1:8010/generate-id";
 
+// ── Signature pad setup ───────────────────────────────────────────────────────
+const canvas = document.getElementById("sigCanvas");
+const hint   = document.getElementById("sigHint");
+
+// Set physical pixel size to match CSS size × device ratio for crisp strokes
+function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * ratio;
+    canvas.height = rect.height * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+    pad.clear();
+}
+
+const pad = new SignaturePad(canvas, {
+    backgroundColor: "rgba(0,0,0,0)",   // transparent — no white fill
+    penColor: "#000099",                 // dark-blue ink
+    minWidth: 1.5,
+    maxWidth: 3
+});
+
+// Show/hide "Sign here" hint
+pad.addEventListener("beginStroke", () => { hint.style.opacity = "0"; });
+pad.addEventListener("afterUpdateStroke", () => {
+    document.getElementById("sigData").value = pad.toDataURL("image/png");
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+    pad.clear();
+    hint.style.opacity = "1";
+    document.getElementById("sigData").value = "";
+});
+
+document.getElementById("undoBtn").addEventListener("click", () => {
+    const data = pad.toData();
+    if (data.length) {
+        data.pop();
+        pad.fromData(data);
+        document.getElementById("sigData").value = pad.isEmpty() ? "" : pad.toDataURL("image/png");
+        if (pad.isEmpty()) hint.style.opacity = "1";
+    }
+});
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load",   resizeCanvas);
+
+// ── Form submit ───────────────────────────────────────────────────────────────
 document.getElementById("testForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const btn       = document.getElementById("genBtn");
-    const status    = document.getElementById("status");
+    const btn         = document.getElementById("genBtn");
+    const status      = document.getElementById("status");
     const placeholder = document.getElementById("placeholder");
-    const resultImg = document.getElementById("resultImg");
+    const resultImg   = document.getElementById("resultImg");
     const downloadBtn = document.getElementById("downloadBtn");
+
+    // Capture latest signature before building FormData
+    if (!pad.isEmpty()) {
+        document.getElementById("sigData").value = pad.toDataURL("image/png");
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Generating…';
@@ -218,7 +326,7 @@ document.getElementById("testForm").addEventListener("submit", async function(e)
     placeholder.textContent = "Processing… this may take a few seconds.";
 
     try {
-        const fd = new FormData(this);
+        const fd  = new FormData(this);
         const res = await fetch(API, { method: "POST", body: fd });
 
         if (!res.ok) {
@@ -241,7 +349,10 @@ document.getElementById("testForm").addEventListener("submit", async function(e)
         placeholder.style.display = "flex";
         placeholder.textContent = "Result will appear here";
         status.style.color = "red";
-        status.textContent = "Error: " + err.message;
+        const isNetworkError = err instanceof TypeError;
+        status.textContent = isNetworkError
+            ? "Error: Cannot reach the ID generator. Start the server and open http://127.0.0.1:8010/test"
+            : "Error: " + err.message;
         console.error(err);
     } finally {
         btn.disabled = false;

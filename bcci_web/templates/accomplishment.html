@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BCCI – Accomplishment Report</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;font-size:13px;background:#f0f2f5;}
+
+/* ── SCREEN layout ── */
+@media screen{
+  .layout{display:flex;gap:1.2rem;padding:1.2rem;min-height:100vh;align-items:flex-start;}
+
+  /* Form panel */
+  .form-panel{
+    width:270px;flex-shrink:0;background:#fff;border-radius:12px;
+    padding:1.2rem;box-shadow:0 2px 12px rgba(0,0,0,.1);
+    position:sticky;top:1.2rem;max-height:calc(100vh - 2.4rem);
+    overflow-y:auto;
+  }
+  .form-panel h2{font-size:.95rem;color:#900010;border-bottom:2px solid #900010;padding-bottom:.4rem;margin-bottom:.9rem;}
+  .fg{margin-bottom:.65rem;}
+  .fg label{display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;}
+  .fg input,.fg select,.fg textarea{
+    width:100%;padding:.38rem .55rem;border:1px solid #ccc;border-radius:6px;
+    font-size:.82rem;font-family:inherit;resize:vertical;
+  }
+  .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:#900010;}
+  .section-label{font-size:.7rem;font-weight:700;color:#900010;text-transform:uppercase;letter-spacing:.04em;margin:.8rem 0 .4rem;}
+  .btn-row{display:flex;gap:.4rem;margin-bottom:.5rem;}
+  .btn{flex:1;padding:.42rem;border:none;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .2s;}
+  .btn-add{background:#0070c0;color:#fff;}.btn-add:hover{background:#005fa0;}
+  .btn-del{background:#900010;color:#fff;}.btn-del:hover{background:#700010;}
+  .btn-print{
+    width:100%;margin-top:.8rem;padding:.55rem;
+    background:#900010;color:#fff;border:none;border-radius:8px;
+    font-size:.9rem;font-weight:700;cursor:pointer;transition:background .2s;
+  }
+  .btn-print:hover{background:#b00015;}
+  #row-editor-list{margin-top:.3rem;}
+  .row-editor{
+    border:1px solid #eee;border-radius:7px;padding:.55rem;
+    margin-bottom:.45rem;background:#fafafa;
+  }
+  .row-editor strong{font-size:.75rem;color:#900010;display:block;margin-bottom:.3rem;}
+  .row-editor input,.row-editor select{
+    width:100%;margin-bottom:.28rem;padding:.3rem .5rem;
+    border:1px solid #ddd;border-radius:5px;font-size:.78rem;font-family:inherit;
+  }
+
+  /* Report preview wrapper */
+  .report-wrapper{flex:1;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.1);overflow:hidden;}
+}
+
+/* ── PRINT ── */
+@media print{
+  @page{size:A4 portrait;margin:14mm 14mm 18mm 20mm;}
+  body{background:#fff;}
+  .form-panel,.btn-print{display:none!important;}
+  .layout{padding:0;display:block;}
+  .report-wrapper{box-shadow:none;border-radius:0;}
+}
+
+/* ── REPORT (screen + print) ── */
+.report{padding:22px 28px 28px;}
+
+.rpt-head{display:flex;align-items:center;gap:12px;border-bottom:3px solid #900010;padding-bottom:10px;margin-bottom:8px;}
+.rpt-seal{
+  width:64px;height:64px;border-radius:50%;border:3px solid #900010;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:900;color:#900010;text-align:center;line-height:1.3;background:#fff8f8;
+}
+.rpt-org{flex:1;text-align:center;}
+.rpt-org .sub{font-size:9.5px;color:#555;}
+.rpt-org .school{font-size:15px;font-weight:900;color:#900010;letter-spacing:.04em;}
+.rpt-org .addr{font-size:9.5px;color:#555;}
+
+.rpt-title{text-align:center;margin:12px 0 8px;}
+.rpt-title h1{font-size:13.5px;font-weight:900;color:#900010;letter-spacing:.08em;text-transform:uppercase;}
+.rpt-title .period{font-size:11.5px;color:#333;margin-top:3px;}
+
+.rpt-info{
+  display:grid;grid-template-columns:1fr 1fr;gap:3px 20px;
+  border:1px solid #ccc;border-radius:6px;padding:9px 13px;
+  margin-bottom:12px;background:#fafafa;font-size:11.5px;color:#333;
+}
+.rpt-info .full{grid-column:1/-1;}
+.rpt-info b{color:#111;}
+
+table.rpt-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:11.5px;}
+table.rpt-tbl thead tr{background:#900010;color:#fff;}
+table.rpt-tbl th{padding:6px 7px;border:1px solid #700;text-align:center;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;}
+table.rpt-tbl td{padding:5px 7px;border:1px solid #ccc;vertical-align:top;}
+table.rpt-tbl tbody tr:nth-child(even){background:#fff8f8;}
+.c-no{text-align:center;width:32px;}
+.c-status{text-align:center;width:84px;}
+.done{color:#0a7c00;font-weight:700;}
+.inprog{color:#b07000;font-weight:700;}
+.notdone{color:#c00000;font-weight:700;}
+
+.rpt-remarks{margin-bottom:18px;}
+.rpt-remarks .lbl{font-weight:700;font-size:11.5px;color:#900010;text-transform:uppercase;margin-bottom:4px;}
+.rpt-remarks .box{min-height:44px;border:1px solid #ccc;border-radius:4px;padding:6px 10px;font-size:11.5px;color:#333;background:#fafafa;}
+
+.rpt-sigs{display:flex;gap:20px;margin-top:22px;}
+.sig-blk{flex:1;}
+.sig-blk .role{font-size:11px;color:#555;margin-bottom:30px;}
+.sig-blk .line{border-top:1.5px solid #333;padding-top:4px;}
+.sig-blk .sname{font-weight:700;font-size:12px;text-transform:uppercase;}
+.sig-blk .spos{font-size:11px;color:#555;}
+.sig-blk .sdate{font-size:11px;color:#555;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ── FORM PANEL ── -->
+<div class="form-panel">
+  <h2>Accomplishment Report</h2>
+
+  <div class="fg"><label>Period — From</label><input type="date" id="f-from"></div>
+  <div class="fg"><label>Period — To</label><input type="date" id="f-to"></div>
+  <div class="fg"><label>Full Name</label><input type="text" id="f-name" placeholder="e.g. Juan D. Cruz"></div>
+  <div class="fg"><label>Position / Designation</label><input type="text" id="f-pos" placeholder="e.g. Instructor I"></div>
+  <div class="fg"><label>Department / Office</label><input type="text" id="f-dept" placeholder="e.g. College of Computer Studies"></div>
+  <div class="fg"><label>Supervisor (Noted by)</label><input type="text" id="f-sup" placeholder="e.g. Maria S. Santos"></div>
+  <div class="fg"><label>Supervisor Position</label><input type="text" id="f-sup-pos" placeholder="e.g. Dean"></div>
+  <div class="fg"><label>Recommendations / Remarks</label><textarea id="f-remarks" rows="3" placeholder="Optional…"></textarea></div>
+
+  <div class="section-label">Accomplishments</div>
+  <div class="btn-row">
+    <button class="btn btn-add" onclick="addRow()">+ Add Row</button>
+    <button class="btn btn-del" onclick="delRow()">− Remove</button>
+  </div>
+  <div id="row-editor-list"></div>
+
+  <button class="btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
+</div>
+
+<!-- ── REPORT PREVIEW ── -->
+<div class="report-wrapper">
+<div class="report">
+
+  <div class="rpt-head">
+    <div class="rpt-seal">BCCI<br>SEAL</div>
+    <div class="rpt-org">
+      <div class="sub">Republic of the Philippines</div>
+      <div class="school">BUTUAN CITY COLLEGES INC.</div>
+      <div class="addr">Butuan City, Agusan del Norte</div>
+    </div>
+    <div class="rpt-seal">BCCI<br>SEAL</div>
+  </div>
+
+  <div class="rpt-title">
+    <h1>Accomplishment Report</h1>
+    <div class="period" id="r-period">For the period: —</div>
+  </div>
+
+  <div class="rpt-info">
+    <div>Name: <b id="r-name">—</b></div>
+    <div>Position: <b id="r-pos">—</b></div>
+    <div class="full">Department / Office: <b id="r-dept">—</b></div>
+  </div>
+
+  <table class="rpt-tbl">
+    <thead>
+      <tr>
+        <th class="c-no">#</th>
+        <th>Objectives / Activities</th>
+        <th>Output / Accomplishment</th>
+        <th class="c-status">Status</th>
+        <th style="width:110px">Remarks</th>
+      </tr>
+    </thead>
+    <tbody id="r-tbody"></tbody>
+  </table>
+
+  <div class="rpt-remarks">
+    <div class="lbl">Recommendations / Comments</div>
+    <div class="box" id="r-remarks">&nbsp;</div>
+  </div>
+
+  <div class="rpt-sigs">
+    <div class="sig-blk">
+      <div class="role">Prepared by:</div>
+      <div class="line">
+        <div class="sname" id="r-sig-name">—</div>
+        <div class="spos"  id="r-sig-pos">—</div>
+        <div class="sdate">Date: ___________________</div>
+      </div>
+    </div>
+    <div class="sig-blk">
+      <div class="role">Noted by:</div>
+      <div class="line">
+        <div class="sname" id="r-sig-sup">—</div>
+        <div class="spos"  id="r-sig-sup-pos">—</div>
+        <div class="sdate">Date: ___________________</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+
+<script>
+// ── Row data ──────────────────────────────────────────────────
+const rows = [
+  {activity:"",output:"",status:"Done",remarks:""},
+  {activity:"",output:"",status:"Done",remarks:""},
+  {activity:"",output:"",status:"Done",remarks:""},
+];
+
+const SC = {Done:"done","In Progress":"inprog","Not Done":"notdone"};
+
+function renderTable(){
+  document.getElementById("r-tbody").innerHTML = rows.map((r,i)=>`
+    <tr>
+      <td class="c-no">${i+1}</td>
+      <td>${r.activity||"&nbsp;"}</td>
+      <td>${r.output||"&nbsp;"}</td>
+      <td class="c-status ${SC[r.status]||""}">${r.status}</td>
+      <td>${r.remarks||"&nbsp;"}</td>
+    </tr>`).join("");
+}
+
+function buildEditors(){
+  const list = document.getElementById("row-editor-list");
+  list.innerHTML = rows.map((r,i)=>`
+    <div class="row-editor">
+      <strong>Row ${i+1}</strong>
+      <input placeholder="Activity / Objective" data-r="${i}" data-c="activity" value="${esc(r.activity)}">
+      <input placeholder="Output / Accomplishment" data-r="${i}" data-c="output" value="${esc(r.output)}">
+      <select data-r="${i}" data-c="status">
+        ${["Done","In Progress","Not Done"].map(s=>`<option${r.status===s?" selected":""}>${s}</option>`).join("")}
+      </select>
+      <input placeholder="Remarks" data-r="${i}" data-c="remarks" value="${esc(r.remarks)}">
+    </div>`).join("");
+  list.querySelectorAll("input,select").forEach(el=>{
+    el.addEventListener("input",e=>{
+      rows[+e.target.dataset.r][e.target.dataset.c]=e.target.value;
+      renderTable();
+    });
+  });
+}
+
+function esc(s){return (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function addRow(){rows.push({activity:"",output:"",status:"Done",remarks:""});renderTable();buildEditors();}
+function delRow(){if(rows.length>1){rows.pop();renderTable();buildEditors();}}
+
+// ── Live sync ─────────────────────────────────────────────────
+function g(id){return document.getElementById(id).value.trim();}
+function fmt(d){
+  if(!d) return "—";
+  const dt=new Date(d+"T00:00:00");
+  return dt.toLocaleDateString("en-PH",{month:"long",day:"numeric",year:"numeric"});
+}
+
+function sync(){
+  const from=g("f-from"), to=g("f-to");
+  document.getElementById("r-period").textContent =
+    (from||to)?`For the period: ${fmt(from)} – ${fmt(to)}`:"For the period: —";
+  const set=(id,val)=>document.getElementById(id).textContent=val||"—";
+  set("r-name",   g("f-name"));
+  set("r-pos",    g("f-pos"));
+  set("r-dept",   g("f-dept"));
+  set("r-sig-name",    g("f-name"));
+  set("r-sig-pos",     g("f-pos"));
+  set("r-sig-sup",     g("f-sup"));
+  set("r-sig-sup-pos", g("f-sup-pos"));
+  const rem=g("f-remarks");
+  document.getElementById("r-remarks").textContent=rem||" ";
+}
+
+["f-from","f-to","f-name","f-pos","f-dept","f-sup","f-sup-pos","f-remarks"]
+  .forEach(id=>document.getElementById(id).addEventListener("input",sync));
+
+// ── Init ──────────────────────────────────────────────────────
+const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,"0");
+const last=new Date(y,now.getMonth()+1,0).getDate();
+document.getElementById("f-from").value=`${y}-${m}-01`;
+document.getElementById("f-to").value  =`${y}-${m}-${last}`;
+renderTable();
+buildEditors();
+sync();
+</script>
+</body>
+</html>

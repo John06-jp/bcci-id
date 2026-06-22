@@ -5,8 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from rembg import remove
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
+import base64
 import io
 from pathlib import Path
+from typing import Optional
 
 app = FastAPI()
 
@@ -28,7 +30,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
 def home():
-    return FileResponse(TEMPLATE_DIR / "index.html")
+    return FileResponse(TEMPLATE_DIR / "test.html")
 
 
 @app.get("/test")
@@ -41,7 +43,8 @@ async def generate_id(
     photo: UploadFile = File(...),
     student_no: str = Form(...),
     full_name: str = Form(...),
-    course_year: str = Form(...)
+    course_year: str = Form(...),
+    signature: Optional[str] = Form(None),
 ):
     # ─── 1. Read & remove background ─────────────────────────────────────────
     input_bytes = await photo.read()
@@ -74,10 +77,33 @@ async def generate_id(
     student = student.resize((new_w, new_h), Image.LANCZOS)
 
     # Centre horizontally AND vertically inside the building zone
-    x = (tw - new_w) // 4
-    y = PHOTO_TOP + (ZONE_H - new_h) // 4
+    x = (tw - new_w) // 2
+    y = PHOTO_TOP + (ZONE_H - new_h) // 2
 
     template.paste(student, (x, y), student)
+
+    # ─── 3b. Overlay digital signature ───────────────────────────────────────
+    if signature:
+        # Strip the data-URL prefix ("data:image/png;base64,…")
+        raw = signature.split(",", 1)[1] if "," in signature else signature
+        sig_img = Image.open(io.BytesIO(base64.b64decode(raw))).convert("RGBA")
+
+        # Make near-white pixels transparent so the signature floats cleanly
+        sig_arr = np.array(sig_img)
+        white = (sig_arr[:, :, 0] > 190) & (sig_arr[:, :, 1] > 190) & (sig_arr[:, :, 2] > 190)
+        sig_arr[white, 3] = 0
+        sig_img = Image.fromarray(sig_arr)
+
+        # Scale to 48 % of card width, preserve aspect ratio
+        sig_w = int(tw * 0.48)
+        sig_h = int(sig_img.height * sig_w / sig_img.width)
+        sig_img = sig_img.resize((sig_w, sig_h), Image.LANCZOS)
+
+        # Place in the lower portion of the photo zone, horizontally centred
+        signature_bottom_margin = 12
+        sig_x = (tw - sig_w) // 2
+        sig_y = PHOTO_BOTTOM - sig_h - signature_bottom_margin
+        template.paste(sig_img, (sig_x, sig_y), sig_img)
 
     # ─── 4. Draw text ────────────────────────────────────────────────────────
     draw = ImageDraw.Draw(template)
