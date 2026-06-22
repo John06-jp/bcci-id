@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCCI ID – Test Page</title>
+    <title>BCCI ID – Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,47 +13,53 @@
             background: #f0f2f5;
             min-height: 100vh;
             display: flex;
-            gap: 2rem;
-            padding: 2rem;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            align-items: flex-start;
         }
 
-        /* ── LEFT: form panel ── */
-        .form-panel {
+        .panel {
             background: #fff;
             border-radius: 12px;
-            padding: 2rem;
-            width: 360px;
-            flex-shrink: 0;
+            padding: 1.5rem;
             box-shadow: 0 2px 12px rgba(0,0,0,.10);
-            height: fit-content;
+        }
+
+        .form-panel {
+            width: 340px;
+            flex-shrink: 0;
+        }
+
+        .content-panel {
+            flex: 1;
+            min-width: 350px;
         }
 
         h2 {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: #900010;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             border-bottom: 2px solid #900010;
-            padding-bottom: .5rem;
+            padding-bottom: .45rem;
         }
 
-        .field { margin-bottom: 1.1rem; }
+        .field { margin-bottom: 1rem; }
 
         label {
             display: block;
             font-size: .82rem;
             font-weight: 600;
             color: #444;
-            margin-bottom: .35rem;
+            margin-bottom: .3rem;
         }
 
         input[type="text"],
         input[type="file"] {
             width: 100%;
-            padding: .6rem .8rem;
+            padding: .55rem .75rem;
             border: 1px solid #ccc;
             border-radius: 7px;
-            font-size: .95rem;
-            transition: border-color .2s;
+            font-size: .9rem;
         }
 
         input[type="text"]:focus {
@@ -61,87 +67,36 @@
             border-color: #900010;
         }
 
-        button {
-            width: 100%;
-            margin-top: .5rem;
-            padding: .75rem;
-            background: #900010;
-            color: #fff;
+        .btn {
+            display: inline-block;
+            padding: .65rem 1.1rem;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: .92rem;
             font-weight: 700;
             cursor: pointer;
             transition: background .2s;
+            text-align: center;
+            text-decoration: none;
         }
-
-        button:hover  { background: #b00015; }
-        button:active { background: #700010; }
-        button:disabled { background: #bbb; cursor: not-allowed; }
+        .btn-primary  { background: #900010; color: #fff; width: 100%; margin-top: .5rem; }
+        .btn-primary:hover  { background: #b00015; }
+        .btn-primary:disabled { background: #bbb; cursor: not-allowed; }
+        .btn-success  { background: #28a745; color: #fff; }
+        .btn-success:hover  { background: #218838; }
+        .btn-success:disabled { background: #bbb; cursor: not-allowed; }
+        .btn-outline  { background: transparent; color: #900010; border: 2px solid #900010; }
+        .btn-outline:hover  { background: #fdf0f0; }
+        .btn-sm { padding: .38rem .8rem; font-size: .82rem; }
 
         .status {
-            margin-top: .8rem;
-            font-size: .88rem;
+            margin-top: .6rem;
+            font-size: .85rem;
             text-align: center;
-            min-height: 1.2rem;
-            color: #555;
+            min-height: 1.1rem;
         }
 
-        /* ── RIGHT: result panel ── */
-        .result-panel {
-            background: #fff;
-            border-radius: 12px;
-            padding: 2rem;
-            flex: 1;
-            box-shadow: 0 2px 12px rgba(0,0,0,.10);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 400px;
-        }
-
-        .result-panel h2 { width: 100%; }
-
-        .placeholder {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #bbb;
-            font-size: 1rem;
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            width: 100%;
-            margin-top: 1rem;
-            min-height: 300px;
-        }
-
-        #resultImg {
-            display: none;
-            max-width: 320px;
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,.15);
-            margin-top: 1rem;
-        }
-
-        #downloadBtn {
-            display: none;
-            width: auto;
-            margin-top: 1.2rem;
-            padding: .6rem 2rem;
-            background: #28a745;
-            text-decoration: none;
-            color: #fff;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: .95rem;
-            transition: background .2s;
-        }
-
-        #downloadBtn:hover { background: #218838; }
-
-        /* signature pad */
+        /* Signature pad */
         .sig-box {
             border: 1.5px solid #ccc;
             border-radius: 7px;
@@ -150,214 +105,574 @@
             overflow: hidden;
             cursor: crosshair;
         }
-        .sig-box canvas { display: block; width: 100%; height: 110px; touch-action: none; }
+        .sig-box canvas { display: block; width: 100%; height: 100px; touch-action: none; }
         .sig-hint {
             position: absolute;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%,-50%);
             color: #ccc;
-            font-size: .85rem;
-            pointer-events: none;
-            transition: opacity .2s;
-        }
-        .sig-actions {
-            display: flex;
-            gap: .5rem;
-            margin-top: .4rem;
-        }
-        .sig-actions button {
-            flex: 1;
-            margin: 0;
-            padding: .45rem;
             font-size: .82rem;
-            font-weight: 600;
-            border-radius: 7px;
-            border: none;
-            cursor: pointer;
-            transition: background .2s;
+            pointer-events: none;
         }
-        #clearBtn  { background: #e0e0e0; color: #333; }
-        #clearBtn:hover  { background: #ccc; }
-        #undoBtn   { background: #e0e0e0; color: #333; }
-        #undoBtn:hover   { background: #ccc; }
+        .sig-actions { display: flex; gap: .4rem; margin-top: .35rem; }
+        .sig-actions .btn { flex: 1; background: #e0e0e0; color: #333; }
+        .sig-actions .btn:hover { background: #ccc; }
 
-        /* spinner */
+        /* Spinner */
         .spinner {
             display: inline-block;
-            width: 16px; height: 16px;
+            width: 14px; height: 14px;
             border: 2px solid rgba(255,255,255,.4);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin .8s linear infinite;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 5px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── EDITOR ── */
+        .editor-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .85rem;
+        }
+
+        .hint-text {
+            font-size: .8rem;
+            color: #888;
+            text-align: center;
+        }
+
+        #cardContainer {
+            position: relative;
+            width: 322px;
+            height: 512px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #templateBg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 322px; height: 512px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #photoOverlay {
+            position: absolute;
+            z-index: 2;
+            cursor: move;
+            display: none;
+            touch-action: none;
+        }
+
+        #sigOverlay {
+            position: absolute;
+            z-index: 3;
+            cursor: move;
+            display: none;
+            touch-action: none;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            width: 322px;
+        }
+        .control-row label {
+            font-size: .8rem;
+            white-space: nowrap;
+            min-width: 110px;
+            margin: 0;
+        }
+        .control-row input[type="range"] { flex: 1; }
+        .val-badge { font-size: .8rem; color: #555; min-width: 38px; text-align: right; }
+
+        .editor-actions {
+            display: flex;
+            gap: .5rem;
+            width: 322px;
+        }
+
+        /* ── RESULT ── */
+        .result-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bbb;
+            font-size: .95rem;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            width: 100%;
+            min-height: 300px;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        #resultImg {
+            max-width: 320px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+        }
+
+        .result-actions { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
     </style>
 </head>
 <body>
 
-<!-- ── FORM ── -->
-<div class="form-panel">
-    <h2>BCCI ID Test Form</h2>
+<!-- ── LEFT: FORM ── -->
+<div class="panel form-panel">
+    <h2>BCCI ID Generator</h2>
 
-    <form id="testForm">
-        <div class="field">
-            <label for="photo">Student Photo</label>
-            <input type="file" id="photo" name="photo" accept="image/*" required>
+    <div class="field">
+        <label for="photo">Student Photo</label>
+        <input type="file" id="photo" accept="image/*" required>
+    </div>
+
+    <div class="field">
+        <label for="student_no">Student No.</label>
+        <input type="text" id="student_no" value="2026-00123">
+    </div>
+
+    <div class="field">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" value="John Paul Cahulogan">
+    </div>
+
+    <div class="field">
+        <label for="course_year">Course / Year</label>
+        <input type="text" id="course_year" value="BSCS - 3RD YEAR">
+    </div>
+
+    <div class="field">
+        <label>Digital Signature <span style="color:#aaa;font-weight:400">(draw below)</span></label>
+        <div class="sig-box">
+            <canvas id="sigCanvas"></canvas>
+            <span class="sig-hint" id="sigHint">Sign here</span>
         </div>
-
-        <div class="field">
-            <label for="student_no">Student No.</label>
-            <input type="text" id="student_no" name="student_no"
-                   value="2026-00123" required>
+        <div class="sig-actions">
+            <button type="button" class="btn btn-sm" id="undoBtn">Undo</button>
+            <button type="button" class="btn btn-sm" id="clearBtn">Clear</button>
         </div>
+    </div>
 
-        <div class="field">
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name"
-                   value="John Paul Cahulogan" required>
-        </div>
-
-        <div class="field">
-            <label for="course_year">Course / Year</label>
-            <input type="text" id="course_year" name="course_year"
-                   value="BSCS - 3RD YEAR" required>
-        </div>
-
-        <div class="field">
-            <label>Digital Signature <span style="color:#aaa;font-weight:400">(draw below)</span></label>
-            <div class="sig-box">
-                <canvas id="sigCanvas"></canvas>
-                <span class="sig-hint" id="sigHint">Sign here</span>
-            </div>
-            <div class="sig-actions">
-                <button type="button" id="undoBtn">Undo</button>
-                <button type="button" id="clearBtn">Clear</button>
-            </div>
-            <input type="hidden" name="signature" id="sigData">
-        </div>
-
-        <button type="submit" id="genBtn">Generate ID</button>
-        <div class="status" id="status"></div>
-    </form>
+    <button class="btn btn-primary" id="removeBgBtn">
+        Step 1: Remove Background &amp; Preview
+    </button>
+    <div class="status" id="status"></div>
 </div>
 
-<!-- ── RESULT ── -->
-<div class="result-panel">
-    <h2>Generated Result</h2>
-    <div class="placeholder" id="placeholder">Result will appear here</div>
-    <img id="resultImg" alt="Generated ID">
-    <a id="downloadBtn" download="BCCI_Student_ID.png">Download PNG</a>
+<!-- ── RIGHT: CONTENT (editor OR result) ── -->
+<div class="panel content-panel">
+
+    <!-- EDITOR VIEW — shown after Step 1 -->
+    <div id="editorView" style="display:none">
+        <h2>Adjust Photo &amp; Signature</h2>
+        <div class="editor-wrap">
+            <p class="hint-text">Drag the photo or signature on the card to reposition &bull; Use sliders to resize</p>
+
+            <div id="cardContainer">
+                <img id="templateBg" src="/static/BCCI ID 2026-2027 FRONT3.png" alt="ID Template">
+                <img id="photoOverlay" alt="" draggable="false">
+                <img id="sigOverlay"   alt="" draggable="false">
+            </div>
+
+            <div class="control-row">
+                <label>Photo size:</label>
+                <input type="range" id="photoSizeSlider" min="50" max="180" value="100">
+                <span class="val-badge" id="photoSizeVal">100%</span>
+            </div>
+
+            <div class="control-row" id="sigSizeRow" style="display:none">
+                <label>Signature size:</label>
+                <input type="range" id="sigSizeSlider" min="50" max="180" value="100">
+                <span class="val-badge" id="sigSizeVal">100%</span>
+            </div>
+
+            <div class="editor-actions">
+                <button class="btn btn-outline btn-sm" id="resetBtn" style="flex:1">Reset Positions</button>
+                <button class="btn btn-success" id="generateBtn" style="flex:2">Step 2: Generate ID</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT VIEW — shown initially and after Step 2 -->
+    <div id="resultView">
+        <h2>Generated Result</h2>
+        <div class="result-wrap">
+            <div class="placeholder" id="placeholder">
+                Complete Step 1 to preview the ID, then click Generate.
+            </div>
+            <img id="resultImg" alt="Generated ID" style="display:none">
+            <div class="result-actions" id="resultActions" style="display:none">
+                <a id="downloadBtn" class="btn btn-success" download="BCCI_Student_ID.png">Download PNG</a>
+                <button id="editAgainBtn" class="btn btn-outline">Edit Again</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-const API = (window.location.hostname === "127.0.0.1" && window.location.port === "8010")
-    ? "/generate-id"
-    : "http://127.0.0.1:8010/generate-id";
+// ── Constants (mirror backend) ─────────────────────────────────────────────
+const TEMPLATE_W  = 644;
+const PHOTO_TOP   = 175;
+const PHOTO_BOTTOM = 695;
+const ZONE_H      = PHOTO_BOTTOM - PHOTO_TOP;  // 520
+const SCALE       = 0.5;  // display is half of template size
 
-// ── Signature pad setup ───────────────────────────────────────────────────────
-const canvas = document.getElementById("sigCanvas");
-const hint   = document.getElementById("sigHint");
+// ── State ──────────────────────────────────────────────────────────────────
+let bgData = null;          // base64 bg-removed photo
+let bgW = 0, bgH = 0;       // natural size of bg-removed photo
 
-// Set physical pixel size to match CSS size × device ratio for crisp strokes
-function resizeCanvas() {
-    const ratio = window.devicePixelRatio || 1;
-    const rect  = canvas.getBoundingClientRect();
-    canvas.width  = rect.width  * ratio;
-    canvas.height = rect.height * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-    pad.clear();
+let photoDefault = null;    // { tx, ty, tw, th } in template coords
+let photoPos     = null;
+let photoSF      = 1.0;     // scale factor relative to default
+
+let sigDefault   = null;
+let sigPos       = null;
+let sigSF        = 1.0;
+let sigExists    = false;
+
+let dragging     = null;    // 'photo' | 'sig' | null
+let dragOff      = { x: 0, y: 0 };
+
+// ── Coordinate helpers ─────────────────────────────────────────────────────
+const t2d = v => v * SCALE;
+const d2t = v => Math.round(v / SCALE);
+
+// ── Default placement logic (mirrors backend) ──────────────────────────────
+function defaultPhotoPos(pw, ph) {
+    const maxW = Math.floor(TEMPLATE_W * 0.85);
+    const s    = Math.min(maxW / pw, ZONE_H / ph);
+    const tw   = Math.floor(pw * s);
+    const th   = Math.floor(ph * s);
+    const tx   = Math.floor((TEMPLATE_W - tw) / 2);
+    const ty   = PHOTO_TOP + Math.floor((ZONE_H - th) / 2);
+    return { tx, ty, tw, th };
 }
 
-const pad = new SignaturePad(canvas, {
-    backgroundColor: "rgba(0,0,0,0)",   // transparent — no white fill
-    penColor: "#000099",                 // dark-blue ink
+function defaultSigPos(natW, natH) {
+    const tw = Math.round(TEMPLATE_W * 0.48);
+    const th = Math.round(natH * tw / natW);
+    const tx = Math.round((TEMPLATE_W - tw) / 2);
+    const ty = PHOTO_BOTTOM - th - 12;
+    return { tx, ty, tw, th };
+}
+
+// ── Apply positions to overlay elements ───────────────────────────────────
+const photoEl = document.getElementById('photoOverlay');
+const sigEl   = document.getElementById('sigOverlay');
+const cardEl  = document.getElementById('cardContainer');
+
+function applyPhoto() {
+    if (!photoPos) return;
+    photoEl.style.left   = t2d(photoPos.tx) + 'px';
+    photoEl.style.top    = t2d(photoPos.ty) + 'px';
+    photoEl.style.width  = t2d(photoPos.tw) + 'px';
+    photoEl.style.height = t2d(photoPos.th) + 'px';
+    photoEl.style.display = 'block';
+}
+
+function applySig() {
+    if (!sigPos) return;
+    sigEl.style.left   = t2d(sigPos.tx) + 'px';
+    sigEl.style.top    = t2d(sigPos.ty) + 'px';
+    sigEl.style.width  = t2d(sigPos.tw) + 'px';
+    sigEl.style.height = t2d(sigPos.th) + 'px';
+    sigEl.style.display = 'block';
+}
+
+// ── Drag handling ─────────────────────────────────────────────────────────
+function pointerInCard(e) {
+    const r   = cardEl.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+}
+
+function beginDrag(type, e) {
+    dragging = type;
+    const p   = pointerInCard(e);
+    const pos = type === 'photo' ? photoPos : sigPos;
+    dragOff = { x: p.x - t2d(pos.tx), y: p.y - t2d(pos.ty) };
+    e.preventDefault();
+}
+
+photoEl.addEventListener('mousedown',  e => photoPos && beginDrag('photo', e));
+sigEl.addEventListener('mousedown',    e => sigPos   && beginDrag('sig',   e));
+photoEl.addEventListener('touchstart', e => photoPos && beginDrag('photo', e), { passive: false });
+sigEl.addEventListener('touchstart',   e => sigPos   && beginDrag('sig',   e), { passive: false });
+
+function onMove(e) {
+    if (!dragging) return;
+    const p  = pointerInCard(e);
+    const nx = d2t(p.x - dragOff.x);
+    const ny = d2t(p.y - dragOff.y);
+    if (dragging === 'photo') { photoPos.tx = nx; photoPos.ty = ny; applyPhoto(); }
+    else                      { sigPos.tx   = nx; sigPos.ty   = ny; applySig();  }
+    e.preventDefault();
+}
+
+document.addEventListener('mousemove', onMove);
+document.addEventListener('touchmove', onMove, { passive: false });
+document.addEventListener('mouseup',  () => { dragging = null; });
+document.addEventListener('touchend', () => { dragging = null; });
+
+// ── Photo size slider ──────────────────────────────────────────────────────
+document.getElementById('photoSizeSlider').addEventListener('input', function () {
+    if (!photoDefault || !photoPos) return;
+    photoSF = this.value / 100;
+    document.getElementById('photoSizeVal').textContent = this.value + '%';
+    const cx = photoPos.tx + photoPos.tw / 2;
+    const cy = photoPos.ty + photoPos.th / 2;
+    photoPos.tw = Math.round(photoDefault.tw * photoSF);
+    photoPos.th = Math.round(photoDefault.th * photoSF);
+    photoPos.tx = Math.round(cx - photoPos.tw / 2);
+    photoPos.ty = Math.round(cy - photoPos.th / 2);
+    applyPhoto();
+});
+
+// ── Sig size slider ────────────────────────────────────────────────────────
+document.getElementById('sigSizeSlider').addEventListener('input', function () {
+    if (!sigDefault || !sigPos) return;
+    sigSF = this.value / 100;
+    document.getElementById('sigSizeVal').textContent = this.value + '%';
+    const cx = sigPos.tx + sigPos.tw / 2;
+    const cy = sigPos.ty + sigPos.th / 2;
+    sigPos.tw = Math.round(sigDefault.tw * sigSF);
+    sigPos.th = Math.round(sigDefault.th * sigSF);
+    sigPos.tx = Math.round(cx - sigPos.tw / 2);
+    sigPos.ty = Math.round(cy - sigPos.th / 2);
+    applySig();
+});
+
+// ── Reset positions ────────────────────────────────────────────────────────
+document.getElementById('resetBtn').addEventListener('click', () => {
+    if (photoDefault) {
+        photoPos = { ...photoDefault };
+        photoSF  = 1;
+        document.getElementById('photoSizeSlider').value = 100;
+        document.getElementById('photoSizeVal').textContent = '100%';
+        applyPhoto();
+    }
+    if (sigDefault) {
+        sigPos = { ...sigDefault };
+        sigSF  = 1;
+        document.getElementById('sigSizeSlider').value = 100;
+        document.getElementById('sigSizeVal').textContent = '100%';
+        applySig();
+    }
+});
+
+// ── Signature pad ──────────────────────────────────────────────────────────
+const sigCanvas = document.getElementById('sigCanvas');
+const sigHint   = document.getElementById('sigHint');
+const pad = new SignaturePad(sigCanvas, {
+    backgroundColor: 'rgba(0,0,0,0)',
+    penColor: '#000099',
     minWidth: 1.5,
     maxWidth: 3
 });
 
-// Show/hide "Sign here" hint
-pad.addEventListener("beginStroke", () => { hint.style.opacity = "0"; });
-pad.addEventListener("afterUpdateStroke", () => {
-    document.getElementById("sigData").value = pad.toDataURL("image/png");
-});
-
-document.getElementById("clearBtn").addEventListener("click", () => {
+function resizeSigCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = sigCanvas.getBoundingClientRect();
+    sigCanvas.width  = rect.width  * ratio;
+    sigCanvas.height = rect.height * ratio;
+    sigCanvas.getContext('2d').scale(ratio, ratio);
     pad.clear();
-    hint.style.opacity = "1";
-    document.getElementById("sigData").value = "";
+}
+
+function refreshSigOverlay() {
+    if (pad.isEmpty()) return;
+    const dataUrl = pad.toDataURL('image/png');
+    sigEl.src = dataUrl;
+
+    const tmp = new Image();
+    tmp.onload = () => {
+        if (!sigExists) {
+            sigDefault = defaultSigPos(tmp.naturalWidth, tmp.naturalHeight);
+            sigPos     = { ...sigDefault };
+            sigSF      = 1;
+            sigExists  = true;
+            document.getElementById('sigSizeRow').style.display = 'flex';
+            document.getElementById('sigSizeSlider').value = 100;
+            document.getElementById('sigSizeVal').textContent = '100%';
+        }
+        if (document.getElementById('editorView').style.display !== 'none') applySig();
+    };
+    tmp.src = dataUrl;
+}
+
+pad.addEventListener('beginStroke', () => { sigHint.style.opacity = '0'; });
+pad.addEventListener('afterUpdateStroke', refreshSigOverlay);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+    pad.clear();
+    sigHint.style.opacity = '1';
+    sigExists = false; sigPos = null; sigDefault = null;
+    sigEl.style.display = 'none';
+    document.getElementById('sigSizeRow').style.display = 'none';
 });
 
-document.getElementById("undoBtn").addEventListener("click", () => {
+document.getElementById('undoBtn').addEventListener('click', () => {
     const data = pad.toData();
-    if (data.length) {
-        data.pop();
-        pad.fromData(data);
-        document.getElementById("sigData").value = pad.isEmpty() ? "" : pad.toDataURL("image/png");
-        if (pad.isEmpty()) hint.style.opacity = "1";
+    if (!data.length) return;
+    data.pop();
+    pad.fromData(data);
+    if (pad.isEmpty()) {
+        sigHint.style.opacity = '1';
+        sigExists = false; sigPos = null; sigEl.style.display = 'none';
+        document.getElementById('sigSizeRow').style.display = 'none';
+    } else {
+        refreshSigOverlay();
     }
 });
 
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("load",   resizeCanvas);
+window.addEventListener('resize', resizeSigCanvas);
+window.addEventListener('load',   resizeSigCanvas);
 
-// ── Form submit ───────────────────────────────────────────────────────────────
-document.getElementById("testForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+// Reset state when user picks a new photo file
+document.getElementById('photo').addEventListener('change', () => {
+    bgData = null; photoDefault = null; photoPos = null;
+    photoEl.style.display = 'none';
+    document.getElementById('editorView').style.display = 'none';
+    document.getElementById('resultView').style.display = 'block';
+    document.getElementById('status').textContent = '';
+});
 
-    const btn         = document.getElementById("genBtn");
-    const status      = document.getElementById("status");
-    const placeholder = document.getElementById("placeholder");
-    const resultImg   = document.getElementById("resultImg");
-    const downloadBtn = document.getElementById("downloadBtn");
+// ── STEP 1: Remove Background ──────────────────────────────────────────────
+document.getElementById('removeBgBtn').addEventListener('click', async () => {
+    const file = document.getElementById('photo').files[0];
+    if (!file) { alert('Please select a student photo first.'); return; }
 
-    // Capture latest signature before building FormData
-    if (!pad.isEmpty()) {
-        document.getElementById("sigData").value = pad.toDataURL("image/png");
-    }
-
+    const btn    = document.getElementById('removeBgBtn');
+    const status = document.getElementById('status');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Generating…';
-    status.textContent = "";
-    resultImg.style.display = "none";
-    downloadBtn.style.display = "none";
-    placeholder.style.display = "flex";
-    placeholder.textContent = "Processing… this may take a few seconds.";
+    btn.innerHTML = '<span class="spinner"></span>Removing background…';
+    status.textContent = '';
 
     try {
-        const fd  = new FormData(this);
-        const res = await fetch(API, { method: "POST", body: fd });
+        const fd = new FormData();
+        fd.append('photo', file);
 
-        if (!res.ok) {
-            const txt = await res.text();
-            throw new Error(txt || `HTTP ${res.status}`);
+        const res = await fetch('/remove-bg', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error(await res.text());
+
+        const data = await res.json();
+        bgData = data.image;
+        bgW    = data.width;
+        bgH    = data.height;
+
+        // Set up photo overlay
+        photoEl.src  = bgData;
+        photoDefault = defaultPhotoPos(bgW, bgH);
+        photoPos     = { ...photoDefault };
+        photoSF      = 1;
+        document.getElementById('photoSizeSlider').value = 100;
+        document.getElementById('photoSizeVal').textContent = '100%';
+        applyPhoto();
+
+        // If sig already drawn, update its overlay
+        if (sigExists) applySig();
+
+        // Show editor, hide result
+        document.getElementById('resultView').style.display = 'none';
+        document.getElementById('editorView').style.display = 'block';
+
+        status.style.color = 'green';
+        status.textContent = 'Background removed! Adjust then click Generate.';
+
+    } catch (err) {
+        status.style.color = 'red';
+        status.textContent = 'Error: ' + err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Step 1: Remove Background & Preview';
+    }
+});
+
+// ── STEP 2: Generate ID ────────────────────────────────────────────────────
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    if (!bgData) { alert('Complete Step 1 first.'); return; }
+
+    const btn    = document.getElementById('generateBtn');
+    const status = document.getElementById('status');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generating…';
+    status.textContent = '';
+
+    try {
+        const fd = new FormData();
+        fd.append('photo_data', bgData);
+        fd.append('photo_x',    photoPos.tx);
+        fd.append('photo_y',    photoPos.ty);
+        fd.append('photo_w',    photoPos.tw);
+        fd.append('photo_h',    photoPos.th);
+        fd.append('student_no',  document.getElementById('student_no').value);
+        fd.append('full_name',   document.getElementById('full_name').value);
+        fd.append('course_year', document.getElementById('course_year').value);
+
+        if (!pad.isEmpty()) {
+            fd.append('signature', pad.toDataURL('image/png'));
+            if (sigExists && sigPos) {
+                fd.append('sig_x', sigPos.tx);
+                fd.append('sig_y', sigPos.ty);
+                fd.append('sig_w', sigPos.tw);
+                fd.append('sig_h', sigPos.th);
+            }
         }
+
+        const res = await fetch('/generate-id', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error(await res.text());
 
         const blob = await res.blob();
         const url  = URL.createObjectURL(blob);
 
-        resultImg.src = url;
-        resultImg.style.display = "block";
-        downloadBtn.href = url;
-        downloadBtn.style.display = "inline-block";
-        placeholder.style.display = "none";
-        status.style.color = "green";
-        status.textContent = "ID generated successfully!";
+        document.getElementById('resultImg').src = url;
+        document.getElementById('resultImg').style.display = 'block';
+        document.getElementById('downloadBtn').href = url;
+        document.getElementById('resultActions').style.display = 'flex';
+        document.getElementById('placeholder').style.display = 'none';
+
+        document.getElementById('editorView').style.display = 'none';
+        document.getElementById('resultView').style.display = 'block';
+
+        status.style.color = 'green';
+        status.textContent = 'ID generated!';
 
     } catch (err) {
-        placeholder.style.display = "flex";
-        placeholder.textContent = "Result will appear here";
-        status.style.color = "red";
-        const isNetworkError = err instanceof TypeError;
-        status.textContent = isNetworkError
-            ? "Error: Cannot reach the ID generator. Start the server and open http://127.0.0.1:8010/test"
-            : "Error: " + err.message;
+        status.style.color = 'red';
+        status.textContent = 'Error: ' + err.message;
         console.error(err);
     } finally {
         btn.disabled = false;
-        btn.textContent = "Generate ID";
+        btn.textContent = 'Step 2: Generate ID';
     }
+});
+
+// ── Edit Again ─────────────────────────────────────────────────────────────
+document.getElementById('editAgainBtn').addEventListener('click', () => {
+    document.getElementById('resultView').style.display  = 'none';
+    document.getElementById('editorView').style.display  = 'block';
+    applyPhoto();
+    if (sigExists) applySig();
 });
 </script>
 
